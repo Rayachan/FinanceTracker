@@ -1,14 +1,12 @@
 from flask import Flask
-from app.database import init_db
+from database import init_db
+from routes import expenses_bp
 
 app = Flask(__name__)
 
 with app.app_context():
     init_db()
 
-from app.routes import expenses_bp
-
-app.register_blueprint(expenses_bp)
 app.register_blueprint(expenses_bp)
 
 if __name__ == "__main__":
