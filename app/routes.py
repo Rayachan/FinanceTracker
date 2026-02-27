@@ -44,3 +44,18 @@ def get_expenses():
         results.append(dict(expense))
 
     return jsonify(results), 200
+
+@expenses_bp.route("/expenses/<int:expense_id>", methods=["DELETE"])
+def delete_expense(expense_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM expenses WHERE id = ?", (expense_id,))
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        conn.close()
+        return jsonify({"error": "Expense not found"}), 404
+
+    conn.close()
+    return jsonify({"message": "Expense deleted"}), 200
