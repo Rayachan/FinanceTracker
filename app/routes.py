@@ -29,3 +29,18 @@ def add_expense():
     conn.close()
 
     return jsonify({"message": "Expense added", "id": new_id}), 201
+
+@expenses_bp.route("/expenses", methods=["GET"])
+def get_expenses():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    expenses = cursor.execute("SELECT * FROM expenses").fetchall()
+
+    conn.close()
+
+    results = []
+    for expense in expenses:
+        results.append(dict(expense))
+
+    return jsonify(results), 200

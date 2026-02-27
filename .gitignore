@@ -1,1 +1,6 @@
-print("Hello, World!")
+venv/
+__pycache__/
+*.pyc
+*.db
+.env
+.env.*
