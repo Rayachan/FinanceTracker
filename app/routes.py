@@ -78,3 +78,42 @@ def expense_summary():
         results[row["category"]] = row["total"]
 
     return jsonify(results), 200
+
+@expenses_bp.route("/expenses/<int:id>", methods=["PUT"])
+def update_expense(id):
+    data = request.get_json()
+
+    amount = data.get("amount")
+    category = data.get("category")
+    description = data.get("description")
+    date = data.get("date")
+
+    if not amount or not category or not date:
+        return jsonify({"error": "amount, category and date are required"}), 400
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Check if expense exists
+    existing = cursor.execute(
+        "SELECT * FROM expenses WHERE id = ?",
+        (id,)
+    ).fetchone()
+
+    if existing is None:
+        conn.close()
+        return jsonify({"error": "Expense not found"}), 404
+
+    cursor.execute(
+        """
+        UPDATE expenses
+        SET amount = ?, category = ?, description = ?, date = ?
+        WHERE id = ?
+        """,
+        (amount, category, description, date, id)
+    )
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": "Expense updated successfully"}), 200
