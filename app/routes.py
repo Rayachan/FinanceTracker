@@ -59,3 +59,22 @@ def delete_expense(expense_id):
 
     conn.close()
     return jsonify({"message": "Expense deleted"}), 200
+
+@expenses_bp.route("/expenses/summary", methods=["GET"])
+def expense_summary():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    summary = cursor.execute("""
+        SELECT category, SUM(amount) as total
+        FROM expenses
+        GROUP BY category
+    """).fetchall()
+
+    conn.close()
+
+    results = {}
+    for row in summary:
+        results[row["category"]] = row["total"]
+
+    return jsonify(results), 200
